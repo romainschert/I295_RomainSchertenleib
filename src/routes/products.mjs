@@ -6,7 +6,7 @@ import { success } from "./helper.mjs";
 const productsRouter = express();
 
 productsRouter.get("/", (req, res) => {
-  const message = "La liste des produits a birn été récupérée.";
+  const message = "La liste des produits a bien été récupérée.";
   res.json(success(message, products));
 });
 export { productsRouter };

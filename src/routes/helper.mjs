@@ -4,3 +4,5 @@ const success = (message, data) => {
     data: data,
   };
 };
+
+export { success };
