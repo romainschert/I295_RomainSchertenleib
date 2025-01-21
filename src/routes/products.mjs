@@ -1,6 +1,12 @@
 import express from "express";
 
-import { products } from "../db/mock-product.mjs";
+import {
+  products,
+  getProduct,
+  removeProduct,
+  updateProduct,
+  getUniqueId,
+} from "../db/mock-product.mjs";
 
 import { success } from "./helper.mjs";
 
