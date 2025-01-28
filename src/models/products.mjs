@@ -20,7 +20,7 @@ const ProductModel = (sequelize, DataTypes) => {
         validate: {
           // Spécifie des règles de validation pour la valeur.
           is: {
-            args: /^[A-Za-z]*$/, // Applique une expression régulière (RegEx) pour valider que la valeur contient uniquement des lettres (A-Z, a-z) et des espaces.
+            args: /^[A-Za-z\s]*$/, // Applique une expression régulière (RegEx) pour valider que la valeur contient uniquement des lettres (A-Z, a-z) et des espaces.
             msg: "Seules les lettres et les espaes sont autorisées.", // : Message d'erreur à afficher si la validation échoue.
           },
           notEmpty: {

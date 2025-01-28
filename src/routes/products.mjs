@@ -1,12 +1,48 @@
 import express from "express";
 import { Product } from "../db/sequelize.mjs";
 import { success } from "./helper.mjs";
+import { ValidationError, Op } from "sequelize";
 const productsRouter = express();
 productsRouter.get("/", (req, res) => {
-  Product.findAll().then((products) => {
-    const message = "La liste des produits a bien été récupérée.";
-    res.json(success(message, products));
-  });
+  if (req.query.name) {
+    // Vérifie si un paramètre name est présent dans les paramètres de la requête (par exemple, /products?name=example).
+    if (req.query.name.length < 2) {
+      // Vérifie si la longueur du terme de recherche (req.query.name) est inférieure à 2 caractères.
+      // Cela garantit que la recherche ne soit pas effectuée avec des chaînes trop courtes, évitant des résultats inutiles ou un traitement inutile.
+      const message = `Le terme de la recherche doit contenir au moins 2 caractères`;
+      return res.status(400).json({ message });
+    }
+    let limit = 3;
+    if (req.query.limit) {
+      // Si un paramètre limit est fourni dans la requête (par exemple, /products?limit=5), cette condition sera vraie.
+      limit = parseInt(req.query.limit); //  Convertit la valeur de req.query.limit (string) en un entier.
+      // La nouvelle valeur de limit remplace la valeur par défaut.
+    }
+    return Product.findAndCountAll({
+      //Utilise la méthode findAll de Sequelize pour rechercher tous les produits correspondant au critère de recherche.
+      // where : Spécifie une clause WHERE pour filtrer les résultats.
+      where: { name: { [Op.like]: `%${req.query.name}%` } }, // Représente une recherche qui correspond à n'importe quelle chaîne contenant le texte fourni (req.query.name)
+      // Utilise l'opérateur Op.like de Sequelize pour effectuer une recherche partielle dans la colonne name.
+      order: ["name"],
+      limit: limit,
+    }).then((products) => {
+      //Si la recherche réussit, la liste des produits correspondants est disponible dans products.
+      const message = `Il y a ${products.length} produits qui correspondent au terme de la recherche`;
+      res.json(success(message, products)); //Retourne une réponse HTTP au format JSON contenant :
+    });
+  }
+  Product.findAll() //Si aucun paramètre name n'est fourni, récupère tous les produits sans appliquer de filtre.
+    .then((products) => {
+      //Indique que la liste complète des produits a été récupérée.
+      const message = "La liste des produits a bien été récupérée.";
+      res.json(success(message, products));
+    })
+    .catch((error) => {
+      // En cas d'erreur pendant la récupération des produits (problème de connexion ou autre), exécute ce bloc.
+      const message =
+        "La liste des produits n'a pas pu être récupérée. Merci de réessayer dans quelques instants.";
+      res.status(500).json({ message, data: error });
+    });
 });
 productsRouter.get("/:id", (req, res) => {
   Product.findByPk(req.params.id)
