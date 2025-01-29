@@ -3,7 +3,8 @@ import { Product } from "../db/sequelize.mjs";
 import { success } from "./helper.mjs";
 import { ValidationError, Op } from "sequelize";
 const productsRouter = express();
-productsRouter.get("/", (req, res) => {
+import { auth } from "../auth/auth.mjs";
+productsRouter.get("/", auth, (req, res) => {
   if (req.query.name) {
     // Vérifie si un paramètre name est présent dans les paramètres de la requête (par exemple, /products?name=example).
     if (req.query.name.length < 2) {
@@ -44,7 +45,7 @@ productsRouter.get("/", (req, res) => {
       res.status(500).json({ message, data: error });
     });
 });
-productsRouter.get("/:id", (req, res) => {
+productsRouter.get("/:id", auth, (req, res) => {
   Product.findByPk(req.params.id)
     .then((product) => {
       if (product === null) {
@@ -62,7 +63,7 @@ productsRouter.get("/:id", (req, res) => {
       res.status(500).json({ message, data: error });
     });
 });
-productsRouter.post("/", (req, res) => {
+productsRouter.post("/", auth, (req, res) => {
   // Déclare une route POST à l'URL racine (/) du routeur productsRouter.
   // Utilisée pour ajouter un produit dans la base de données.
 
@@ -89,7 +90,7 @@ productsRouter.post("/", (req, res) => {
       // Le message et les détails de l'erreur sont inclus dans la réponse JSON.
     });
 });
-productsRouter.delete("/:id", (req, res) => {
+productsRouter.delete("/:id", auth, (req, res) => {
   Product.findByPk(req.params.id).then((deletedProduct) => {
     Product.destroy({
       where: { id: deletedProduct.id },
@@ -101,7 +102,7 @@ productsRouter.delete("/:id", (req, res) => {
     });
   });
 });
-productsRouter.put("/:id", (req, res) => {
+productsRouter.put("/:id", auth, (req, res) => {
   const productId = req.params.id;
   Product.update(req.body, { where: { id: productId } })
     .then((_) => {

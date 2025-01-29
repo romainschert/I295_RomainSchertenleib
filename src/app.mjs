@@ -26,6 +26,10 @@ app.get("/api/", (req, res) => {
 
 import { productsRouter } from "./routes/products.mjs";
 app.use("/api/products", productsRouter);
+import { productsRouter } from "./routes/products.mjs";
+app.use("/api/products", productsRouter);
+import { loginRouter } from "./routes/login.mjs";
+app.use("/api/login", loginRouter);
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);
